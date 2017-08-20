@@ -169,40 +169,6 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
             Log.v(TAG, "Notification sent. Status: " + status);
         }
 
-
-
-
-//
-//        @Override
-//        public void onCharacteristicWriteRequest(BluetoothDevice device, int requestId,
-//                                                 BluetoothGattCharacteristic characteristic, boolean preparedWrite, boolean responseNeeded,
-//                                                 int offset, byte[] value) {
-//            super.onCharacteristicWriteRequest(device, requestId, characteristic, preparedWrite,
-//                    responseNeeded, offset, value);
-//            Log.v(TAG, "Characteristic Write request: " + Arrays.toString(value));
-//            int status = mAlertServiceFragment.writeCharacteristic(characteristic, offset, value);
-//            if (responseNeeded) {
-//                mGattServer.sendResponse(device, requestId, status,
-//            /* No need to respond with an offset */ 0,
-//            /* No need to respond with a value */ null);
-//            }
-//        }
-
-//        @Override
-//        public void onDescriptorReadRequest(BluetoothDevice device, int requestId,
-//                                            int offset, BluetoothGattDescriptor descriptor) {
-//            super.onDescriptorReadRequest(device, requestId, offset, descriptor);
-//            Log.d(TAG, "Device tried to read descriptor: " + descriptor.getUuid());
-//            Log.d(TAG, "Value: " + Arrays.toString(descriptor.getValue()));
-//            if (offset != 0) {
-//                mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_INVALID_OFFSET, offset,
-//            /* value (optional) */ null);
-//                return;
-//            }
-//            mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset,
-//                    descriptor.getValue());
-//        }
-
         @Override
         public void onDescriptorWriteRequest(BluetoothDevice device, int requestId,
                                              BluetoothGattDescriptor descriptor, boolean preparedWrite, boolean responseNeeded,
