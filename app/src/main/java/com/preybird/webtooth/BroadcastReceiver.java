@@ -24,7 +24,9 @@ public class BroadcastReceiver extends FlicBroadcastReceiver {
     @Override
     public void onButtonUpOrDown(Context context, FlicButton button, boolean wasQueued, int timeDiff, boolean isUp, boolean isDown) {
         if (isDown) {
+            // TODO: Notify here
 
+            // TODO: Remove
             Notification notification = new Notification.Builder(context)
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setContentTitle("Button was pressed")
