@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
-import android.content.Context;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelUuid;
@@ -88,8 +86,6 @@ public class AlertServiceFragment extends Fragment {
         return view;
     }
 
-
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -106,7 +102,6 @@ public class AlertServiceFragment extends Fragment {
         super.onDetach();
         mDelegate = null;
     }
-
 
     public BluetoothGattService getBluetoothGattService() {
         return mImmediateAlertService;

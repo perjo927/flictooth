@@ -12,7 +12,6 @@ import java.util.Date;
 
 import io.flic.lib.FlicBroadcastReceiver;
 import io.flic.lib.FlicButton;
-import android.widget.Toast;
 
 public class BroadcastReceiver extends FlicBroadcastReceiver {
     @Override
@@ -22,9 +21,11 @@ public class BroadcastReceiver extends FlicBroadcastReceiver {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onButtonUpOrDown(Context context, FlicButton button, boolean wasQueued, int timeDiff, boolean isUp, boolean isDown) {
+    public void onButtonUpOrDown(Context context, FlicButton button, boolean wasQueued,
+                                 int timeDiff, boolean isUp, boolean isDown) {
         if (isDown) {
             // TODO: Notify here
+
 
             // TODO: Remove
             Notification notification = new Notification.Builder(context)
