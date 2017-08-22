@@ -23,13 +23,19 @@
             </intent-filter>
         </activity>
         <receiver
-            android:name=".BroadcastReceiver"
+            android:name=".ButtonBroadcastReceiver"
             android:enabled="true"
             android:exported="true" >
             <intent-filter>
                 <action android:name="io.flic.FLICLIB_EVENT" />
             </intent-filter>
         </receiver>
+
+        <!--<receiver android:name=".MyBroadcastReceiver"  android:exported="true">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.SPIN" />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
     </application>
 
 </manifest>

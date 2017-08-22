@@ -4,10 +4,15 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelUuid;
 import android.support.annotation.RequiresApi;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,13 +46,16 @@ public class AlertServiceFragment extends Fragment {
 
     private ServiceFragmentDelegate mDelegate;
 
-
     private final View.OnClickListener mNotifyButtonListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            mDelegate.sendNotificationToDevices(mImmediateAlertLevelCharacteristic);
+            sendNotificationToDevices();
         }
     };
+
+    public void sendNotificationToDevices() {
+        mDelegate.sendNotificationToDevices(mImmediateAlertLevelCharacteristic);
+    }
 
     // GATT
     private BluetoothGattService mImmediateAlertService;
@@ -72,11 +80,27 @@ public class AlertServiceFragment extends Fragment {
     }
 
 
+
+    private final BroadcastReceiver mYourBroadcastReceiver = new BroadcastReceiver()
+    {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            sendNotificationToDevices();
+        }
+    };
+
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_alert, container, false);
+
+        // start listening for refresh local file list in
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mYourBroadcastReceiver,
+                new IntentFilter("SPINNA_LOSS"));
+        //
 
         Button notifyButton = view.findViewById(R.id.button_immediateAlertLevelNotify);
         notifyButton.setOnClickListener(mNotifyButtonListener);
@@ -84,6 +108,13 @@ public class AlertServiceFragment extends Fragment {
         setImmediateAlertLevel(INITIAL_IMMEDIATE_ALERT_LEVEL, null);
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView()
+    {
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mYourBroadcastReceiver);
+        super.onDestroyView();
     }
 
     @Override
