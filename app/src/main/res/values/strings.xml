@@ -20,9 +20,6 @@
     <string name="status_devicesConnected">Devices Connected:</string>
     <string name="status_errorWhenConnecting">An error occurred when connecting to a device. Error Code</string>
 
-    <string name="immediateAlertService_name">Immediate Alert Service</string>
-
-    <string name="notify">Notify</string>
     <string name="notificationsEnabled">Notifications enabled</string>
     <string name="notificationsNotEnabled">Notifications not enabled</string>
 
