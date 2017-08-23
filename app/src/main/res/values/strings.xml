@@ -1,20 +1,20 @@
 <resources>
     <string name="app_name">WebTooth</string>
 
-
-    <string name="notify">Notify</string>
-
     <string name="label_advertisingStatus">Advertising Status</string>
-    <string name="status_advertising">Advertising (Keep Screen On)</string>
+    <string name="status_advertising">Advertising (Lock Screen)</string>
     <string name="status_notAdvertising">Not Advertising</string>
-    <string name="status_advDataTooLarge">Not Advertising. Advertisement is larger than 31 bytes.</string>
-    <string name="status_advFeatureUnsupported">Not Advertising. Advertising not supported.</string>
-    <string name="status_advInternalError">Not Advertising. Internal error occurred.</string>
-    <string name="status_advTooManyAdvertisers">Not Advertising. No advertising instance is available.</string>
+    <string name="status_advDataTooLarge">Not Advertising(too large)</string>
+    <string name="status_advFeatureUnsupported">Not Advertising (not supported)</string>
+    <string name="status_advInternalError">Not Advertising (Internal error occurred)</string>
+    <string name="status_advTooManyAdvertisers">Not Advertising (No advertising instance is available)</string>
+    <string name="status_noLeAdv">LE Advertising is not available. Please pair with a device to be
+        discoverable.
+    </string>
 
-    <string name="bluetoothNotSupported">BLE Per-ipheral Simulator closing: Bluetooth Not Supported</string>
-    <string name="bluetoothNotEnabled">BLE Per-ipheral Simulator closing: Bluetooth is Not Enabled</string>
-    <string name="bluetoothAdvertisingNotSupported">BLE Per-ipheral Simulator closing: BLE Advertising Not Supported</string>
+    <string name="bluetoothNotSupported">BLE closing (Bluetooth Not Supported)</string>
+    <string name="bluetoothNotEnabled">BLE closing (Bluetooth is Not Enabled)</string>
+    <string name="bluetoothAdvertisingNotSupported">BLE closing (BLE Advertising Not Supported)</string>
 
     <string name="label_connectionStatus">Connection Status</string>
     <string name="status_devicesConnected">Devices Connected:</string>
@@ -22,13 +22,10 @@
 
     <string name="immediateAlertService_name">Immediate Alert Service</string>
 
+    <string name="notify">Notify</string>
     <string name="notificationsEnabled">Notifications enabled</string>
     <string name="notificationsNotEnabled">Notifications not enabled</string>
 
-    <string name="status_noLeAdv">LE Advertising is not available. Please pair with a device to be
-        discoverable.
-    </string>
     <string name="menu_disconnect_devices">Disconnect Devices</string>
-
 
 </resources>

@@ -16,7 +16,6 @@ import io.flic.lib.FlicButton;
 import io.flic.lib.FlicManager;
 import io.flic.lib.FlicManagerInitializedCallback;
 
-
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -31,13 +30,11 @@ import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertiseSettings;
 import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.content.Context;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -45,7 +42,6 @@ import java.util.UUID;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class MainActivity extends AppCompatActivity implements AlertServiceFragment.ServiceFragmentDelegate {
-
 
     private static final int REQUEST_ENABLE_BT = 1;
     private static final String TAG = MainActivity.class.getCanonicalName();
@@ -71,12 +67,10 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
         @Override
         public void onStartFailure(int errorCode) {
             super.onStartFailure(errorCode);
-            Log.e(TAG, "Not broadcasting: " + errorCode);
             int statusText;
             switch (errorCode) {
                 case ADVERTISE_FAILED_ALREADY_STARTED:
                     statusText = R.string.status_advertising;
-                    Log.w(TAG, "App was already advertising");
                     break;
                 case ADVERTISE_FAILED_DATA_TOO_LARGE:
                     statusText = R.string.status_advDataTooLarge;
@@ -92,14 +86,12 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
                     break;
                 default:
                     statusText = R.string.status_notAdvertising;
-                    Log.wtf(TAG, "Unhandled error: " + errorCode);
             }
             mAdvStatus.setText(statusText);
         }
         @Override
         public void onStartSuccess(AdvertiseSettings settingsInEffect) {
             super.onStartSuccess(settingsInEffect);
-            Log.v(TAG, "Broadcasting");
             mAdvStatus.setText(R.string.status_advertising);
         }
     };
@@ -126,17 +118,14 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
                 if (newState == BluetoothGatt.STATE_CONNECTED) {
                     mBluetoothDevices.add(device);
                     updateConnectedDevicesStatus();
-                    Log.v(TAG, "Connected to device: " + device.getAddress());
                 } else if (newState == BluetoothGatt.STATE_DISCONNECTED) {
                     mBluetoothDevices.remove(device);
                     updateConnectedDevicesStatus();
-                    Log.v(TAG, "Disconnected from device");
                 }
             } else {
                 mBluetoothDevices.remove(device);
                 updateConnectedDevicesStatus();
-                // There are too many gatt errors (some of them not even in the documentation) so we just
-                // show the error to the user.
+
                 final String errorMessage = getString(R.string.status_errorWhenConnecting) + ": " + status;
                 runOnUiThread(new Runnable() {
                     @Override
@@ -144,7 +133,6 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
                         Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                     }
                 });
-                Log.e(TAG, "Error when connecting: " + status);
             }
         }
 
@@ -152,11 +140,10 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
         public void onCharacteristicReadRequest(BluetoothDevice device, int requestId, int offset,
                                                 BluetoothGattCharacteristic characteristic) {
             super.onCharacteristicReadRequest(device, requestId, offset, characteristic);
-            Log.d(TAG, "Device tried to read characteristic: " + characteristic.getUuid());
-            Log.d(TAG, "Value: " + Arrays.toString(characteristic.getValue()));
+
             if (offset != 0) {
-                mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_INVALID_OFFSET, offset,
-            /* value (optional) */ null);
+                mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_INVALID_OFFSET,
+                        offset, null);
                 return;
             }
             mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS,
@@ -166,7 +153,6 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
         @Override
         public void onNotificationSent(BluetoothDevice device, int status) {
             super.onNotificationSent(device, status);
-            Log.v(TAG, "Notification sent. Status: " + status);
         }
 
         @Override
@@ -176,8 +162,8 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
                                              byte[] value) {
             super.onDescriptorWriteRequest(device, requestId, descriptor, preparedWrite, responseNeeded,
                     offset, value);
-            Log.v(TAG, "Descriptor Write Request " + descriptor.getUuid() + " " + Arrays.toString(value));
-            int status = BluetoothGatt.GATT_SUCCESS;
+
+            int status;
             if (descriptor.getUuid() == CLIENT_CHARACTERISTIC_CONFIGURATION_UUID) {
                 BluetoothGattCharacteristic characteristic = descriptor.getCharacteristic();
                 boolean supportsNotifications = (characteristic.getProperties() &
@@ -196,12 +182,12 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
                 } else if (supportsNotifications &&
                         Arrays.equals(value, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)) {
                     status = BluetoothGatt.GATT_SUCCESS;
-                    mAlertServiceFragment.notificationsEnabled(characteristic, false /* indicate */);
+                    mAlertServiceFragment.notificationsEnabled(characteristic, false);
                     descriptor.setValue(value);
                 } else if (supportsIndications &&
                         Arrays.equals(value, BluetoothGattDescriptor.ENABLE_INDICATION_VALUE)) {
                     status = BluetoothGatt.GATT_SUCCESS;
-                    mAlertServiceFragment.notificationsEnabled(characteristic, true /* indicate */);
+                    mAlertServiceFragment.notificationsEnabled(characteristic, true);
                     descriptor.setValue(value);
                 } else {
                     status = BluetoothGatt.GATT_REQUEST_NOT_SUPPORTED;
@@ -211,16 +197,11 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
                 descriptor.setValue(value);
             }
             if (responseNeeded) {
-                mGattServer.sendResponse(device, requestId, status,
-            /* No need to respond with offset */ 0,
-            /* No need to respond with a value */ null);
+                mGattServer.sendResponse(device, requestId, status, 0, null);
             }
         }
     };
 
-
-
-    //
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -239,10 +220,6 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
             }
         });
 
-
-
-
-
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mAdvStatus = (TextView) findViewById(R.id.textView_advertisingStatus);
         mConnectionStatus = (TextView) findViewById(R.id.textView_connectionStatus);
@@ -250,7 +227,6 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
         mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = mBluetoothManager.getAdapter();
 
-        // If we are not being restored from a previous state then create and add the fragment.
         if (savedInstanceState == null) {
             mAlertServiceFragment = new AlertServiceFragment();
             getFragmentManager()
@@ -260,7 +236,6 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
         } else {
             mAlertServiceFragment = (AlertServiceFragment) getFragmentManager().findFragmentByTag(CURRENT_FRAGMENT_TAG);
         }
-           //mAlertServiceFragment = new AlertServiceFragment();
         mBluetoothGattService = mAlertServiceFragment.getBluetoothGattService();
 
         mAdvSettings = new AdvertiseSettings.Builder()
@@ -281,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
-        return true /* show menu */;
+        return true;
     }
 
     @Override
@@ -291,17 +266,14 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
             if (resultCode == RESULT_OK) {
                 if (!mBluetoothAdapter.isMultipleAdvertisementSupported()) {
                     Toast.makeText(this, R.string.bluetoothAdvertisingNotSupported, Toast.LENGTH_LONG).show();
-                    Log.e(TAG, "Advertising not supported");
                 }
                 onStart();
             } else {
                 Toast.makeText(this, R.string.bluetoothNotEnabled, Toast.LENGTH_LONG).show();
-                Log.e(TAG, "Bluetooth not enabled");
                 finish();
             }
         }
 
-        //
         FlicManager.getInstance(this, new FlicManagerInitializedCallback() {
             @Override
             public void onInitialized(FlicManager manager) {
@@ -316,21 +288,16 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
         });
     }
 
-
-
     @Override
     protected void onStart() {
         super.onStart();
         resetStatusViews();
-        // If the user disabled Bluetooth when the app was in the background,
-        // openGattServer() will return null.
+
         mGattServer = mBluetoothManager.openGattServer(this, mGattServerCallback);
         if (mGattServer == null) {
             ensureBleFeaturesAvailable();
             return;
         }
-        // Add a service for a total of three services (Generic Attribute and Generic Access
-        // are present by default).
         mGattServer.addService(mBluetoothGattService);
 
         if (mBluetoothAdapter.isMultipleAdvertisementSupported()) {
@@ -345,9 +312,9 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_disconnect_devices) {
             disconnectFromDevices();
-            return true /* event_consumed */;
+            return true;
         }
-        return false /* event_consumed */;
+        return false;
     }
 
     @Override
@@ -357,22 +324,16 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
             mGattServer.close();
         }
         if (mBluetoothAdapter.isEnabled() && mAdvertiser != null) {
-            // If stopAdvertising() gets called before close() a null
-            // pointer exception is raised.
             mAdvertiser.stopAdvertising(mAdvCallback);
         }
         resetStatusViews();
     }
-
-
-
 
     public void sendNotificationToDevices(BluetoothGattCharacteristic characteristic) {
         boolean indicate = (characteristic.getProperties()
                 & BluetoothGattCharacteristic.PROPERTY_INDICATE)
                 == BluetoothGattCharacteristic.PROPERTY_INDICATE;
         for (BluetoothDevice device : mBluetoothDevices) {
-            // true for indication (acknowledge) and false for notification (unacknowledge).
             mGattServer.notifyCharacteristicChanged(device, characteristic, indicate);
         }
     }
@@ -393,8 +354,6 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
         });
     }
 
-
-    //
     public static BluetoothGattDescriptor getClientCharacteristicConfigurationDescriptor() {
         BluetoothGattDescriptor descriptor = new BluetoothGattDescriptor(
                 CLIENT_CHARACTERISTIC_CONFIGURATION_UUID,
@@ -417,19 +376,15 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
     private void ensureBleFeaturesAvailable() {
         if (mBluetoothAdapter == null) {
             Toast.makeText(this, R.string.bluetoothNotSupported, Toast.LENGTH_LONG).show();
-            Log.e(TAG, "Bluetooth not supported");
             finish();
         } else if (!mBluetoothAdapter.isEnabled()) {
-            // Make sure bluetooth is enabled.
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
     }
     private void disconnectFromDevices() {
-        Log.d(TAG, "Disconnecting devices...");
         for (BluetoothDevice device : mBluetoothManager.getConnectedDevices(
                 BluetoothGattServer.GATT)) {
-            Log.d(TAG, "Devices: " + device.getAddress() + " " + device.getName());
             mGattServer.cancelConnection(device);
         }
     }
