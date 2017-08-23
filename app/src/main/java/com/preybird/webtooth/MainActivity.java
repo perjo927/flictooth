@@ -30,7 +30,6 @@ import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertiseSettings;
 import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.content.Context;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -68,12 +67,10 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
         @Override
         public void onStartFailure(int errorCode) {
             super.onStartFailure(errorCode);
-            Log.e(TAG, "Not broadcasting: " + errorCode);
             int statusText;
             switch (errorCode) {
                 case ADVERTISE_FAILED_ALREADY_STARTED:
                     statusText = R.string.status_advertising;
-                    Log.w(TAG, "App was already advertising");
                     break;
                 case ADVERTISE_FAILED_DATA_TOO_LARGE:
                     statusText = R.string.status_advDataTooLarge;
@@ -89,14 +86,12 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
                     break;
                 default:
                     statusText = R.string.status_notAdvertising;
-                    Log.wtf(TAG, "Unhandled error: " + errorCode);
             }
             mAdvStatus.setText(statusText);
         }
         @Override
         public void onStartSuccess(AdvertiseSettings settingsInEffect) {
             super.onStartSuccess(settingsInEffect);
-            Log.v(TAG, "Broadcasting");
             mAdvStatus.setText(R.string.status_advertising);
         }
     };
@@ -123,11 +118,9 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
                 if (newState == BluetoothGatt.STATE_CONNECTED) {
                     mBluetoothDevices.add(device);
                     updateConnectedDevicesStatus();
-                    Log.v(TAG, "Connected to device: " + device.getAddress());
                 } else if (newState == BluetoothGatt.STATE_DISCONNECTED) {
                     mBluetoothDevices.remove(device);
                     updateConnectedDevicesStatus();
-                    Log.v(TAG, "Disconnected from device");
                 }
             } else {
                 mBluetoothDevices.remove(device);
@@ -140,7 +133,6 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
                         Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                     }
                 });
-                Log.e(TAG, "Error when connecting: " + status);
             }
         }
 
@@ -148,8 +140,7 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
         public void onCharacteristicReadRequest(BluetoothDevice device, int requestId, int offset,
                                                 BluetoothGattCharacteristic characteristic) {
             super.onCharacteristicReadRequest(device, requestId, offset, characteristic);
-            Log.d(TAG, "Device tried to read characteristic: " + characteristic.getUuid());
-            Log.d(TAG, "Value: " + Arrays.toString(characteristic.getValue()));
+
             if (offset != 0) {
                 mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_INVALID_OFFSET,
                         offset, null);
@@ -162,7 +153,6 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
         @Override
         public void onNotificationSent(BluetoothDevice device, int status) {
             super.onNotificationSent(device, status);
-            Log.v(TAG, "Notification sent. Status: " + status);
         }
 
         @Override
@@ -172,8 +162,8 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
                                              byte[] value) {
             super.onDescriptorWriteRequest(device, requestId, descriptor, preparedWrite, responseNeeded,
                     offset, value);
-            Log.v(TAG, "Descriptor Write Request " + descriptor.getUuid() + " " + Arrays.toString(value));
-            int status = BluetoothGatt.GATT_SUCCESS;
+
+            int status;
             if (descriptor.getUuid() == CLIENT_CHARACTERISTIC_CONFIGURATION_UUID) {
                 BluetoothGattCharacteristic characteristic = descriptor.getCharacteristic();
                 boolean supportsNotifications = (characteristic.getProperties() &
@@ -276,12 +266,10 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
             if (resultCode == RESULT_OK) {
                 if (!mBluetoothAdapter.isMultipleAdvertisementSupported()) {
                     Toast.makeText(this, R.string.bluetoothAdvertisingNotSupported, Toast.LENGTH_LONG).show();
-                    Log.e(TAG, "Advertising not supported");
                 }
                 onStart();
             } else {
                 Toast.makeText(this, R.string.bluetoothNotEnabled, Toast.LENGTH_LONG).show();
-                Log.e(TAG, "Bluetooth not enabled");
                 finish();
             }
         }
@@ -388,19 +376,15 @@ public class MainActivity extends AppCompatActivity implements AlertServiceFragm
     private void ensureBleFeaturesAvailable() {
         if (mBluetoothAdapter == null) {
             Toast.makeText(this, R.string.bluetoothNotSupported, Toast.LENGTH_LONG).show();
-            Log.e(TAG, "Bluetooth not supported");
             finish();
         } else if (!mBluetoothAdapter.isEnabled()) {
-            // Make sure bluetooth is enabled.
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
     }
     private void disconnectFromDevices() {
-        Log.d(TAG, "Disconnecting devices...");
         for (BluetoothDevice device : mBluetoothManager.getConnectedDevices(
                 BluetoothGattServer.GATT)) {
-            Log.d(TAG, "Devices: " + device.getAddress() + " " + device.getName());
             mGattServer.cancelConnection(device);
         }
     }

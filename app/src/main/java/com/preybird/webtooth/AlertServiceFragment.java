@@ -57,7 +57,6 @@ public class AlertServiceFragment extends Fragment {
         mDelegate.sendNotificationToDevices(mImmediateAlertLevelCharacteristic);
     }
 
-    // GATT
     private BluetoothGattService mImmediateAlertService;
     private BluetoothGattCharacteristic mImmediateAlertLevelCharacteristic;
 
@@ -79,8 +78,6 @@ public class AlertServiceFragment extends Fragment {
         mImmediateAlertService.addCharacteristic(mImmediateAlertLevelCharacteristic);
     }
 
-
-
     private final BroadcastReceiver mYourBroadcastReceiver = new BroadcastReceiver()
     {
         @Override
@@ -90,17 +87,14 @@ public class AlertServiceFragment extends Fragment {
     };
 
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_alert, container, false);
 
-        // start listening for refresh local file list in
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mYourBroadcastReceiver,
-                new IntentFilter("SPINNA_LOSS"));
-        //
+                new IntentFilter("SPIN_BUTTON"));
 
         Button notifyButton = view.findViewById(R.id.button_immediateAlertLevelNotify);
         notifyButton.setOnClickListener(mNotifyButtonListener);
@@ -144,7 +138,7 @@ public class AlertServiceFragment extends Fragment {
 
     private void setImmediateAlertLevel(int newImmediateAlertLevel, View source) {
         mImmediateAlertLevelCharacteristic.setValue(newImmediateAlertLevel,
-                BluetoothGattCharacteristic.FORMAT_UINT8, /* offset */ 0);
+                BluetoothGattCharacteristic.FORMAT_UINT8, 0);
     }
 
     public int writeCharacteristic(BluetoothGattCharacteristic characteristic, int offset, byte[] value) {
