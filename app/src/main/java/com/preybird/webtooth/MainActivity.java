@@ -44,7 +44,6 @@ import java.util.UUID;
 public class MainActivity extends AppCompatActivity implements AlertServiceFragment.ServiceFragmentDelegate {
 
     private static final int REQUEST_ENABLE_BT = 1;
-    private static final String TAG = MainActivity.class.getCanonicalName();
     private static final String CURRENT_FRAGMENT_TAG = "CURRENT_FRAGMENT";
 
     private static final UUID CHARACTERISTIC_USER_DESCRIPTION_UUID = UUID

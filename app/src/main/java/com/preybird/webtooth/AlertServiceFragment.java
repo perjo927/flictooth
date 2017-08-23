@@ -16,7 +16,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.UUID;
@@ -45,13 +44,6 @@ public class AlertServiceFragment extends Fragment {
     // The value 0x01 is interpreted as “Mild Alert”
 
     private ServiceFragmentDelegate mDelegate;
-
-    private final View.OnClickListener mNotifyButtonListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            sendNotificationToDevices();
-        }
-    };
 
     public void sendNotificationToDevices() {
         mDelegate.sendNotificationToDevices(mImmediateAlertLevelCharacteristic);
@@ -96,10 +88,7 @@ public class AlertServiceFragment extends Fragment {
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mYourBroadcastReceiver,
                 new IntentFilter("SPIN_BUTTON"));
 
-        Button notifyButton = view.findViewById(R.id.button_immediateAlertLevelNotify);
-        notifyButton.setOnClickListener(mNotifyButtonListener);
-
-        setImmediateAlertLevel(INITIAL_IMMEDIATE_ALERT_LEVEL, null);
+        setImmediateAlertLevel(INITIAL_IMMEDIATE_ALERT_LEVEL);
 
         return view;
     }
@@ -136,7 +125,7 @@ public class AlertServiceFragment extends Fragment {
         return new ParcelUuid(IMMEDIATE_ALERT_SERVICE_UUID);
     }
 
-    private void setImmediateAlertLevel(int newImmediateAlertLevel, View source) {
+    private void setImmediateAlertLevel(int newImmediateAlertLevel) {
         mImmediateAlertLevelCharacteristic.setValue(newImmediateAlertLevel,
                 BluetoothGattCharacteristic.FORMAT_UINT8, 0);
     }
